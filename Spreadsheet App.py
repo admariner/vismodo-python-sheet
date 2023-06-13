@@ -18,24 +18,28 @@ def create_sp(rows, columns, width, lst):
     columns = str(int(columns)-1)
     for c in range(int(columns)):
         for r in range(int(rows)):
-            cmd = 'r'+str(r)+'c'+str(c)
+            cmd = f'r{str(r)}c{str(c)}'
             if r == 0:
                 (tk.Label(root, text=str(c+1))).place(x = (int(r)*12*int(width)), y = str((int(c)*26)+40))
-                exec('global '+cmd+'; '+cmd+ '= tk.Entry(root, bg = "light blue", width='+str(width)+')')
+                exec(
+                    f'global {cmd}; {cmd}= tk.Entry(root, bg = "light blue", width={str(width)})'
+                )
             else:
                 if c == 0:
                     (tk.Label(root, text=str(r))).place(x = str((int(r)*12*int(width))), y = 0)
-                    exec('global '+cmd+'; '+cmd+ '= tk.Entry(root, bg = "light blue", width='+str(width)+')')
+                    exec(
+                        f'global {cmd}; {cmd}= tk.Entry(root, bg = "light blue", width={str(width)})'
+                    )
                 else:
-                    exec('global '+cmd+'; '+cmd+ '= tk.Entry(root, width='+str(width)+')')
-            if lst == None:
-                pass
-            else:
+                    exec(f'global {cmd}; {cmd}= tk.Entry(root, width={str(width)})')
+            if lst != None:
                 try:
-                    exec('global '+cmd+'; '+cmd+ '.insert(tk.END, lst[c][r])')
+                    exec(f'global {cmd}; {cmd}.insert(tk.END, lst[c][r])')
                 except:
                     pass
-            exec(cmd+'.place(x='+str((int(r)*12*int(width))+40)+', y ='+str((int(c)*26)+40)+')')
+            exec(
+                f'{cmd}.place(x={str(int(r) * 12 * int(width) + 40)}, y ={str(int(c) * 26 + 40)})'
+            )
     (tk.Label(root, text=str(r+1))).place(x = str((int(r+1)*12*int(width))), y = 0)
 
     def savefile():
@@ -43,22 +47,21 @@ def create_sp(rows, columns, width, lst):
         file_loc = asksaveasfile(filetypes = (("Comma Separated Values","*.csv"),))
         csv_text = []
         if hasattr(file_loc, 'name'):
-            file_loc = open(file_loc.name, 'w')
-            for c in range(int(columns)):
-                csv_text.append('\n')
-                for r in range(int(rows)):
-                    cmd = 'r'+str(r)+'c'+str(c)
-                    if not r == int(columns)-1:
-                        exec('global  csv_text; csv_text.append((' + cmd + '.get()).replace(",", "&"))')
-            csv_text.pop(0)
-            csv_text = str(csv_text)
-            csv_text = csv_text.replace('[', '')
-            csv_text = csv_text.replace("'", '')
-            csv_text = csv_text.replace(']', '')
-            csv_text = csv_text.replace('\\n, ', '\n')
-            file_loc.write(csv_text)
-            file_loc.close()
-        
+            with open(file_loc.name, 'w') as file_loc:
+                for c in range(int(columns)):
+                    csv_text.append('\n')
+                    for r in range(int(rows)):
+                        cmd = f'r{str(r)}c{str(c)}'
+                        if r != int(columns) - 1:
+                            exec(f'global  csv_text; csv_text.append(({cmd}.get()).replace(",", "&"))')
+                csv_text.pop(0)
+                csv_text = str(csv_text)
+                csv_text = csv_text.replace('[', '')
+                csv_text = csv_text.replace("'", '')
+                csv_text = csv_text.replace(']', '')
+                csv_text = csv_text.replace('\\n, ', '\n')
+                file_loc.write(csv_text)
+
     menubar = tk.Menu(root)
     file_drop= tk.Menu(menubar, tearoff=0)
     file_drop.add_command(label="New CSV", command=get_dims)
